@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>VI PortWatch — Live Progress Tracker</title>
+  <meta name="description" content="A clean live progress dashboard for public GTA VI PC-port research projects.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#07090d;--panel:#0d1118;--panel2:#111722;--line:#202938;--text:#f5f7fb;--muted:#8e99aa;--accent:#79f2c0;--accent2:#7aa7ff;--danger:#ff7185;--shadow:0 20px 70px rgba(0,0,0,.35)}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 500px at 50% -10%,rgba(83,127,255,.16),transparent 65%),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
+    a{color:inherit;text-decoration:none}.wrap{max-width:1180px;margin:auto;padding:24px}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:8px 0 24px}.brand{font-weight:800;letter-spacing:-.03em;font-size:20px}.brand span{color:var(--accent)}
+    .navlinks{display:flex;gap:20px;color:var(--muted);font-size:13px}.navlinks a:hover{color:#fff}
+    .hero{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;align-items:stretch;margin-top:8px}
+    .card{background:linear-gradient(145deg,rgba(17,23,34,.92),rgba(10,14,21,.92));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+    .hero-main{padding:34px}.eyebrow{font-size:12px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.14em}
+    h1{font-size:clamp(34px,6vw,64px);line-height:.98;letter-spacing:-.055em;margin:14px 0}.sub{color:var(--muted);max-width:700px;line-height:1.7}
+    .status{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:8px 12px;border:1px solid #24352f;background:#0d1714;border-radius:999px;color:#c6fbe6;font-size:12px}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent)}
+    .hero-side{padding:28px;display:flex;flex-direction:column;justify-content:space-between}.side-title{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+    .big{font-size:54px;font-weight:800;letter-spacing:-.06em;margin:8px 0}.big small{font-size:16px;color:var(--muted);font-weight:500}
+    .updated{font-size:12px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:14px 0}
+    .stat{padding:20px}.stat b{display:block;font-size:25px;margin-top:6px}.stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+    .section{margin-top:34px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:14px}.section h2{margin:0;font-size:22px;letter-spacing:-.03em}.hint{font-size:12px;color:var(--muted)}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.toolbar input,.toolbar select{background:#0d121a;border:1px solid var(--line);color:#fff;padding:11px 13px;border-radius:12px;outline:none}
+    .list{display:grid;gap:12px}.project{padding:20px;display:grid;grid-template-columns:1fr 150px;gap:20px}.project-top{display:flex;justify-content:space-between;gap:14px}.name{font-weight:700}.tag{font-size:10px;color:var(--muted);border:1px solid var(--line);padding:5px 8px;border-radius:999px;white-space:nowrap}
+    .meta{color:var(--muted);font-size:12px;margin:7px 0 14px}.bar{height:9px;background:#1a222e;border-radius:999px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:999px;transition:width .5s}.score{font-size:30px;font-weight:800;text-align:right}.score small{font-size:12px;color:var(--muted)}
+    footer{padding:36px 0 20px;color:var(--muted);font-size:11px;line-height:1.6;text-align:center}
+    .empty{padding:30px;text-align:center;color:var(--muted)}.error{color:#ffc3cb;background:#1b0f14;border:1px solid #3b2029;padding:12px;border-radius:12px;font-size:12px;margin-bottom:14px}
+    @media(max-width:800px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.project{grid-template-columns:1fr}.score{text-align:left}.navlinks{display:none}.wrap{padding:16px}.hero-main{padding:25px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">VI <span>PORTWATCH</span></div>
+    <div class="navlinks"><a href="#race">Race</a><a href="#news">Updates</a><a href="#method">Method</a></div>
+  </nav>
+
+  <section class="hero">
+    <div class="card hero-main">
+      <div class="eyebrow">Live progress tracker</div>
+      <h1>Does GTA VI run on PC yet?</h1>
+      <div class="sub">A cleaner, faster dashboard for following publicly documented progress toward PC playability. Data is pulled from the public tracker feed and refreshed automatically.</div>
+      <div class="status"><span class="dot"></span><span id="status">Connecting to live data…</span></div>
+    </div>
+    <div class="card hero-side">
+      <div><div class="side-title">Closest effort</div><div class="big" id="closest">—<small>%</small></div></div>
+      <div class="updated" id="updated">Last update: —</div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <div class="card stat"><span>Overall progress</span><b id="overall">—%</b></div>
+    <div class="card stat"><span>Furthest milestone</span><b id="milestone">—</b></div>
+    <div class="card stat"><span>Tracked efforts</span><b id="count">—</b></div>
+    <div class="card stat"><span>Top-3 average</span><b id="top3">—%</b></div>
+  </div>
+
+  <section class="section" id="race">
+    <div class="section-head"><div><h2>The race</h2><div class="hint">Publicly documented projects, sorted by progress.</div></div></div>
+    <div id="error"></div>
+    <div class="toolbar"><input id="search" placeholder="Search projects…" /><select id="sort"><option value="score">Highest progress</option><option value="name">Name</option></select></div>
+    <div class="list" id="projects"><div class="card empty">Loading live tracker data…</div></div>
+  </section>
+
+  <section class="section" id="news">
+    <div class="section-head"><div><h2>What's happening</h2><div class="hint">Keep the update feed concise and easy to scan.</div></div></div>
+    <div class="card empty" id="newsbox">News data will appear here when supplied by the upstream feed.</div>
+  </section>
+
+  <section class="section" id="method">
+    <div class="section-head"><div><h2>Method</h2><div class="hint">Simple, transparent progress scoring.</div></div></div>
+    <div class="card" style="padding:24px;color:var(--muted);line-height:1.75;font-size:13px">
+      The dashboard intentionally contains no game files, keys, executables, or download links. It only presents public progress information. The upstream tracker states that its feed is refreshed every three hours; this page checks for fresh data every three minutes.
+    </div>
+  </section>
+
+  <footer>Fan-made informational tracker. Not affiliated with or endorsed by Rockstar Games, Take-Two Interactive or Microsoft.</footer>
+</div>
+
+<script>
+const API='/api/tracker';
+let state={projects:[],news:[]};
+
+function num(v){const n=Number(v);return Number.isFinite(n)?n:0}
+function normalize(d){
+  const projects = d.projects || d.entries || d.efforts || d.leaderboard || [];
+  return {
+    projects: projects.map((p,i)=>({
+      name:p.name||p.title||`Project ${i+1}`,
+      score:num(p.score ?? p.progress ?? p.percent ?? p.percentage),
+      milestone:p.milestone||p.stage||p.status||'Progress tracked',
+      meta:p.description||p.summary||p.repo||''
+    })),
+    news:d.news||d.updates||[],
+    overall:num(d.overall_progress ?? d.overall ?? Math.max(0,...projects.map(x=>x.score))),
+    milestone:d.furthest_milestone||d.milestone||'—',
+    updated:d.updated_at||d.updated||d.last_updated||''
+  };
+}
+function render(d){
+  state=normalize(d);
+  const ps=[...state.projects].sort((a,b)=>b.score-a.score);
+  const top3=ps.slice(0,3);
+  const avg=top3.length?top3.reduce((s,p)=>s+p.score,0)/top3.length:0;
+  document.querySelector('#closest').innerHTML=`${(ps[0]?.score??0).toFixed(0)}<small>%</small>`;
+  document.querySelector('#overall').textContent=`${state.overall.toFixed(0)}%`;
+  document.querySelector('#milestone').textContent=state.milestone;
+  document.querySelector('#count').textContent=ps.length;
+  document.querySelector('#top3').textContent=`${avg.toFixed(0)}%`;
+  document.querySelector('#updated').textContent=`Last update: ${state.updated ? new Date(state.updated).toLocaleString() : 'upstream feed'}`;
+  document.querySelector('#status').textContent='Live data connected';
+  drawProjects();
+  const news=state.news;
+  document.querySelector('#newsbox').innerHTML=news.length?news.slice(0,6).map(n=>`<div style="padding:12px 0;border-bottom:1px solid var(--line)"><b style="color:#fff">${escapeHtml(n.title||n.headline||'Update')}</b><div style="margin-top:5px">${escapeHtml(n.summary||n.description||'')}</div></div>`).join(''):'No news items in the current feed.';
+}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function drawProjects(){
+  const q=document.querySelector('#search').value.toLowerCase();
+  const sort=document.querySelector('#sort').value;
+  let ps=state.projects.filter(p=>(p.name+' '+p.meta).toLowerCase().includes(q));
+  ps.sort(sort==='name'?(a,b)=>a.name.localeCompare(b.name):(a,b)=>b.score-a.score);
+  const el=document.querySelector('#projects');
+  el.innerHTML=ps.length?ps.map(p=>`<article class="card project"><div><div class="project-top"><div class="name">${escapeHtml(p.name)}</div><div class="tag">${escapeHtml(p.milestone)}</div></div><div class="meta">${escapeHtml(p.meta)}</div><div class="bar"><div class="fill" style="width:${Math.max(0,Math.min(100,p.score))}%"></div></div></div><div class="score">${p.score.toFixed(0)}<small>%</small></div></article>`).join(''):'<div class="card empty">No matching projects.</div>';
+}
+async function load(){
+  try{
+    const r=await fetch(API+'?t='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw new Error('Feed unavailable');
+    render(await r.json());
+    document.querySelector('#error').innerHTML='';
+  }catch(e){
+    document.querySelector('#status').textContent='Live feed unavailable';
+    document.querySelector('#error').innerHTML='<div class="error">Could not refresh the upstream feed right now. The dashboard will retry automatically.</div>';
+  }
+}
+document.querySelector('#search').addEventListener('input',drawProjects);
+document.querySelector('#sort').addEventListener('change',drawProjects);
+load(); setInterval(load,180000);
+</script>
+</body>
+</html>
